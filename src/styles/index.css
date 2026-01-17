@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  /* The "Bell Ringer" Alert Animation */
+  .animate-bell-ring {
+    animation: ring 2s infinite;
+  }
+
+  @keyframes ring {
+    0% { transform: rotate(0); }
+    10% { transform: rotate(15deg); }
+    20% { transform: rotate(-15deg); }
+    30% { transform: rotate(10deg); }
+    40% { transform: rotate(-10deg); }
+    50% { transform: rotate(0); }
+    100% { transform: rotate(0); }
+  }
+
+  /* Mobile-First Input Styling for Field Surveyors */
+  .input-field {
+    @apply w-full p-4 text-lg border-2 border-slate-200 rounded-xl focus:border-blue-600 outline-none transition-all;
+  }
+
+  /* Part C Print Formatting */
+  @media print {
+    .no-print {
+      display: none !important;
+    }
+    body {
+      background-color: white;
+      font-size: 12pt;
+    }
+    .print-break {
+      page-break-after: always;
+    }
+  }
+
+  /* Status Badges for Village Wagoora Dashboard */
+  .badge-oosc {
+    @apply bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-bold border border-red-200 uppercase;
+  }
+
+  .badge-enrolled {
+    @apply bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold border border-green-200 uppercase;
+  }
+}
+
+/* Custom scrollbar for the HOI Command Center */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 10px;
+}
