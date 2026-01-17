@@ -3,171 +3,217 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>J&K 100% Enrollment Portal</title>
+    <title>Kashmir Division Education Census</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        body { background-color: #f4f7f6; padding-bottom: 50px; }
-        .admin-header { background: #1e3a8a; color: white; padding: 20px; border-radius: 0 0 20px 20px; margin-bottom: 20px; }
-        .section-card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-left: 5px solid #3b82f6; }
-        .member-card { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; margin-bottom: 15px; border-left: 5px solid #10b981; }
-        .dropout-highlight { background: #fff1f2; border: 1px solid #fecaca; padding: 15px; border-radius: 8px; margin-top: 10px; display: none; }
-        label { font-size: 0.85rem; font-weight: 600; color: #374151; margin-top: 10px; }
+        body { background-color: #f0f2f5; padding-bottom: 60px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .kashmir-header { background: #065f46; color: white; padding: 25px; border-radius: 0 0 25px 25px; margin-bottom: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .section-card { background: white; border-radius: 15px; padding: 20px; margin-bottom: 20px; border: 1px solid #e5e7eb; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
+        .member-card { background: #fff; border-left: 6px solid #10b981; border-radius: 12px; padding: 20px; margin-bottom: 15px; border-top: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee; }
+        .dropout-box { background: #fff1f2; border: 1px solid #fecaca; padding: 15px; border-radius: 10px; margin-top: 15px; display: none; }
+        label { font-size: 0.8rem; font-weight: 700; color: #4b5563; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 8px; }
+        .form-control, .form-select { border-radius: 8px; border: 1px solid #d1d5db; padding: 10px; }
     </style>
 </head>
 <body>
 
-<div class="admin-header text-center">
-    <h2>🎓 J&K Educational Census</h2>
-    <p>Mission: Every Child in School | Integrated Welfare Tracking</p>
+<div class="kashmir-header text-center">
+    <h3>🏔️ Kashmir Division: Education Census</h3>
+    <p class="mb-0 opacity-75">Target: 100% Enrollment & Dropout Recovery</p>
 </div>
 
-<div class="container" style="max-width: 950px;">
+<div class="container" style="max-width: 900px;">
+    
     <div class="section-card">
-        <h5 class="text-primary border-bottom pb-2">📍 Location Details</h5>
+        <h6 class="text-success fw-bold mb-3"><i class="bi bi-geo-alt"></i> REGIONAL JURISDICTION (KASHMIR)</h6>
         <div class="row g-3">
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <label>District</label>
                 <select id="dist" class="form-select" onchange="updateTehsils()">
                     <option value="">Select District</option>
-                    <option value="Srinagar">Srinagar</option><option value="Jammu">Jammu</option>
-                    <option value="Anantnag">Anantnag</option><option value="Baramulla">Baramulla</option>
-                    <option value="Kathua">Kathua</option><option value="Udhampur">Udhampur</option>
-                    </select>
+                    <option value="Srinagar">Srinagar</option>
+                    <option value="Anantnag">Anantnag</option>
+                    <option value="Baramulla">Baramulla</option>
+                    <option value="Budgam">Budgam</option>
+                    <option value="Pulwama">Pulwama</option>
+                    <option value="Kupwara">Kupwara</option>
+                    <option value="Shopian">Shopian</option>
+                    <option value="Kulgam">Kulgam</option>
+                    <option value="Bandipora">Bandipora</option>
+                    <option value="Ganderbal">Ganderbal</option>
+                </select>
             </div>
-            <div class="col-md-3"><label>Tehsil</label><select id="teh" class="form-select" onchange="updateVillages()"><option>Select Tehsil</option></select></div>
-            <div class="col-md-3"><label>Block</label><input type="text" id="blk" class="form-control" placeholder="Block Name"></div>
-            <div class="col-md-3"><label>Village/Ward</label><select id="vil" class="form-select"><option>Select Village</option></select></div>
-            <div class="col-md-6"><label>Mohallah / Habitation</label><input type="text" id="hab" class="form-control" placeholder="e.g. Near Masjid/Panchayat Ghar"></div>
-            <div class="col-md-6"><label>House Type</label>
+            <div class="col-md-4">
+                <label>Tehsil</label>
+                <select id="teh" class="form-select" onchange="updateVillages()">
+                    <option value="">Select Tehsil</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label>Village / Ward</label>
+                <select id="vil" class="form-select">
+                    <option value="">Select Village</option>
+                </select>
+            </div>
+            <div class="col-md-4"><label>Block</label><input type="text" id="blk" class="form-control" placeholder="Block Name"></div>
+            <div class="col-md-4"><label>Mohallah / Habitation</label><input type="text" id="hab" class="form-control" placeholder="Specific Area"></div>
+            <div class="col-md-4">
+                <label>House Type</label>
                 <select id="houseType" class="form-select">
-                    <option value="Pucca">Pucca</option><option value="Kuccha">Kuccha</option><option value="Rented">Rented</option>
+                    <option value="Pucca">Pucca</option>
+                    <option value="Kuccha">Kuccha</option>
+                    <option value="Rented">Rented</option>
                 </select>
             </div>
         </div>
     </div>
 
     <div class="section-card">
-        <h5 class="text-primary border-bottom pb-2">👪 Household & Parents</h5>
+        <h6 class="text-success fw-bold mb-3">🏠 HOUSEHOLD PROFILE</h6>
         <div class="row g-3">
-            <div class="col-md-4"><label>Head of Household</label><input type="text" id="head" class="form-control"></div>
+            <div class="col-md-4"><label>Head of Family</label><input type="text" id="head" class="form-control"></div>
             <div class="col-md-4"><label>Parent Occupation</label><input type="text" id="occ" class="form-control"></div>
-            <div class="col-md-4"><label>Mobile Number</label><input type="tel" id="mobile" class="form-control" maxlength="10"></div>
-            <div class="col-md-4">
-                <label>Category</label>
+            <div class="col-md-4"><label>Mobile Number</label><input type="tel" id="mobile" class="form-control"></div>
+            <div class="col-md-6">
+                <label>Social Category</label>
                 <select id="cat" class="form-select">
-                    <option value="General">General</option><option value="SC">SC</option><option value="ST">ST</option><option value="OBC">OBC</option><option value="EWS">EWS</option>
+                    <option value="General">General</option>
+                    <option value="RBA">RBA</option>
+                    <option value="ST">ST</option>
+                    <option value="SC">SC</option>
+                    <option value="OBC">OBC</option>
+                    <option value="EWS">EWS</option>
                 </select>
             </div>
-            <div class="col-md-4"><label>Household ID (Auto)</label><input type="text" id="hId" class="form-control bg-light" readonly></div>
+            <div class="col-md-6"><label>Auto-ID</label><input type="text" id="hId" class="form-control bg-light" readonly></div>
         </div>
     </div>
 
     <div id="membersContainer"></div>
 
-    <div class="d-grid gap-3 mb-5">
-        <button class="btn btn-warning fw-bold py-3" onclick="addMember()">+ ADD INDIVIDUAL MEMBER</button>
-        <button class="btn btn-primary btn-lg" onclick="saveData()">💾 SAVE ENTIRE HOUSEHOLD</button>
-        <button class="btn btn-success" onclick="exportToExcel()">📊 DOWNLOAD J&K CENSUS REPORT (EXCEL)</button>
+    <div class="d-grid gap-3 mt-4">
+        <button class="btn btn-dark btn-lg shadow" onclick="addMember()">+ ADD MEMBER DETAILS</button>
+        <button class="btn btn-success btn-lg shadow" onclick="saveData()">💾 SAVE ALL & CLEAR FORM</button>
+        <hr>
+        <button class="btn btn-outline-primary" onclick="exportToExcel()">📊 DOWNLOAD KASHMIR CENSUS (EXCEL)</button>
     </div>
 </div>
 
 <script>
-    // DATA MAPPING (Sample - Expand this for all J&K)
-    const geoData = {
-        "Srinagar": { "Tehsils": ["Srinagar South", "Srinagar North", "Eidgah", "Khanyar"], "Villages": ["Nowhatta", "Rainawari", "Batamaloo"] },
-        "Jammu": { "Tehsils": ["Jammu", "Bishnah", "Akhnoor", "R.S. Pura"], "Villages": ["Village A", "Village B"] }
+    // DATA FOR KASHMIR DIVISION
+    const kashmirData = {
+        "Srinagar": {
+            "Tehsils": ["Srinagar North", "Srinagar South", "Eidgah", "Khanyar", "Pantha Chowk", "Shalteng", "Chanapora"],
+            "Villages": ["Nowhatta", "Soura", "Batamaloo", "Hazratbal", "Zoonimar"]
+        },
+        "Anantnag": {
+            "Tehsils": ["Anantnag", "Dooru", "Kokernag", "Shangus", "Bijbehara", "Pahalgam", "Mattan"],
+            "Villages": ["Vessu", "Qazigund", "Dialgam"]
+        },
+        "Baramulla": {
+            "Tehsils": ["Baramulla", "Sopore", "Pattan", "Gulmarg", "Uri", "Rafiabad", "Tangmarg"],
+            "Villages": ["Delina", "Kanispora", "Palhalan"]
+        },
+        "Budgam": {
+            "Tehsils": ["Budgam", "Chadoora", "Beerwah", "Khansahib", "Magam", "B.K. Pora"],
+            "Villages": ["Ompora", "Ichgam"]
+        }
+        // Add other districts (Pulwama, Kupwara, etc.) here following the same format
     };
 
     function updateTehsils() {
         const d = document.getElementById('dist').value;
         const tSel = document.getElementById('teh');
-        tSel.innerHTML = '<option>Select Tehsil</option>';
-        if(geoData[d]) geoData[d].Tehsils.forEach(t => tSel.add(new Option(t, t)));
+        tSel.innerHTML = '<option value="">Select Tehsil</option>';
+        if(kashmirData[d]) kashmirData[d].Tehsils.forEach(t => tSel.add(new Option(t, t)));
     }
 
     function updateVillages() {
         const d = document.getElementById('dist').value;
         const vSel = document.getElementById('vil');
-        vSel.innerHTML = '<option>Select Village</option>';
-        if(geoData[d]) geoData[d].Villages.forEach(v => vSel.add(new Option(v, v)));
+        vSel.innerHTML = '<option value="">Select Village</option>';
+        if(kashmirData[d]) kashmirData[d].Villages.forEach(v => vSel.add(new Option(v, v)));
     }
 
-    let masterDB = JSON.parse(localStorage.getItem('JK_Edu_Census')) || [];
+    let db = JSON.parse(localStorage.getItem('KashmirCensus')) || [];
 
     function addMember() {
         const container = document.getElementById('membersContainer');
         const div = document.createElement('div');
-        div.className = 'member-card';
+        div.className = 'member-card shadow-sm';
         div.innerHTML = `
             <div class="row g-2">
-                <div class="col-md-4"><label>Name</label><input type="text" class="form-control mName"></div>
-                <div class="col-md-2"><label>Age</label><input type="number" class="form-control mAge"></div>
-                <div class="col-md-3"><label>Gender</label><select class="form-select mGen"><option>Male</option><option>Female</option><option>Other</option></select></div>
-                <div class="col-md-3"><label>Disability</label><select class="form-select mDis"><option>None</option><option>Physical</option><option>Visual</option><option>Hearing</option><option>Learning</option></select></div>
+                <div class="col-md-6"><label>Name</label><input type="text" class="form-control mName"></div>
+                <div class="col-md-3"><label>Age</label><input type="number" class="form-control mAge"></div>
+                <div class="col-md-3"><label>Gender</label><select class="form-select mGen"><option>Female</option><option>Male</option><option>Other</option></select></div>
             </div>
             
             <div class="row g-2 mt-2">
-                <div class="col-md-4"><label>Education Status</label><select class="form-select mStat" onchange="toggleEdu(this)"><option value="Enrolled">Currently Enrolled</option><option value="Dropout">Dropout</option><option value="Never Enrolled">Never Enrolled</option></select></div>
-                <div class="col-md-4"><label>Current Class/Grade</label><input type="text" class="form-control mClass" placeholder="e.g. 7th"></div>
-                <div class="col-md-4"><label>School Name & Loc</label><input type="text" class="form-control mSchool"></div>
+                <div class="col-md-6"><label>Disability (if any)</label><select class="form-select mDis"><option>None</option><option>Physical</option><option>Visual</option><option>Hearing</option><option>Learning</option></select></div>
+                <div class="col-md-6"><label>Enrollment Status</label><select class="form-select mStat" onchange="toggleDropout(this)"><option value="Enrolled">Currently Enrolled</option><option value="Dropout">Dropout</option><option value="Never Enrolled">Never Enrolled</option></select></div>
             </div>
 
-            <div class="mt-3 dropout-highlight">
+            <div class="row g-2 mt-2">
+                <div class="col-md-6"><label>School Name</label><input type="text" class="form-control mSchool"></div>
+                <div class="col-md-6"><label>Class / Grade</label><input type="text" class="form-control mClass"></div>
+            </div>
+
+            <div class="dropout-box">
                 <label class="text-danger fw-bold">Discontinuation Analysis</label>
                 <div class="row g-2">
-                    <div class="col-md-6"><label>Previous Qualification</label><input type="text" class="form-control mPrev"></div>
-                    <div class="col-md-6"><label>Reason for Dropout/Never Enrolled</label><select class="form-select mReason"><option>Financial</option><option>Disability</option><option>No Nearby School</option><option>Household Chores</option><option>Lack of Interest</option></select></div>
-                    <div class="col-md-12"><label>Willing to Rejoin?</label><select class="form-select mWilling"><option>Yes</option><option>No</option><option>Needs Motivation</option></select></div>
+                    <div class="col-md-12"><label>Reason</label><select class="form-select mReason"><option value="">Select Reason...</option><option>Financial Constraints</option><option>Disability</option><option>No Nearby School</option><option>Household Responsibilities</option><option>Lack of Interest</option></select></div>
+                    <div class="col-md-12"><label>Willing to re-join?</label><select class="form-select mWilling"><option>Yes</option><option>No</option><option>Needs Counseling</option></select></div>
                 </div>
             </div>
 
-            <div class="mt-3 p-2 bg-light rounded">
-                <label class="small">Scheme Benefits (Scholarship, MDM, Uniform, Books etc.)</label>
-                <div class="d-flex gap-3 mt-1">
-                    <input type="checkbox" class="mBenefit"> Receiving Any Benefits? 
-                    <input type="text" class="form-control form-control-sm mBenefitDetail" placeholder="Specify (e.g. Uniform/MDM)">
-                </div>
+            <div class="mt-3 p-2 bg-light rounded small">
+                <input type="checkbox" class="mBenefit"> Receiving Govt Schemes (MDM/Scholarship/Uniform)?
+                <input type="text" class="form-control form-control-sm mt-1 mBenefitDetail" placeholder="Specify scheme names">
             </div>
         `;
         container.appendChild(div);
     }
 
-    function toggleEdu(sel) {
-        const dropBox = sel.closest('.member-card').querySelector('.dropout-highlight');
-        dropBox.style.display = (sel.value === 'Enrolled') ? 'none' : 'block';
+    function toggleDropout(sel) {
+        const box = sel.closest('.member-card').querySelector('.dropout-box');
+        box.style.display = (sel.value === 'Enrolled') ? 'none' : 'block';
     }
 
     function saveData() {
+        const hId = `KSH-${Date.now().toString().slice(-5)}`;
         const cards = document.querySelectorAll('.member-card');
-        const hId = `H-${Date.now().toString().slice(-4)}`;
         
         cards.forEach(c => {
-            masterDB.push({
-                District: document.getElementById('dist').value, Tehsil: document.getElementById('teh').value,
-                Block: document.getElementById('blk').value, Village: document.getElementById('vil').value,
-                Mohallah: document.getElementById('hab').value, HouseType: document.getElementById('houseType').value,
-                HouseID: hId, Head: document.getElementById('head').value, Mobile: document.getElementById('mobile').value,
-                ParentOcc: document.getElementById('occ').value, Category: document.getElementById('cat').value,
-                Name: c.querySelector('.mName').value, Age: c.querySelector('.mAge').value,
-                Gender: c.querySelector('.mGen').value, Disability: c.querySelector('.mDis').value,
-                Status: c.querySelector('.mStat').value, Class: c.querySelector('.mClass').value,
-                School: c.querySelector('.mSchool').value, Reason: c.querySelector('.mReason').value,
-                Willing: c.querySelector('.mWilling').value, Benefit: c.querySelector('.mBenefit').checked ? "Yes" : "No",
-                BenefitDetails: c.querySelector('.mBenefitDetail').value
+            db.push({
+                District: document.getElementById('dist').value,
+                Tehsil: document.getElementById('teh').value,
+                Village: document.getElementById('vil').value,
+                Habitation: document.getElementById('hab').value,
+                HouseType: document.getElementById('houseType').value,
+                HouseID: hId,
+                Mobile: document.getElementById('mobile').value,
+                Name: c.querySelector('.mName').value,
+                Age: c.querySelector('.mAge').value,
+                Gender: c.querySelector('.mGen').value,
+                Status: c.querySelector('.mStat').value,
+                School: c.querySelector('.mSchool').value,
+                Class: c.querySelector('.mClass').value,
+                Willing: c.querySelector('.mWilling').value,
+                Benefits: c.querySelector('.mBenefit').checked ? "Yes" : "No"
             });
         });
 
-        localStorage.setItem('JK_Edu_Census', JSON.stringify(masterDB));
-        alert("Household Data Saved Offline!");
+        localStorage.setItem('KashmirCensus', JSON.stringify(db));
+        alert("Data Saved Successfully!");
         location.reload();
     }
 
     function exportToExcel() {
-        const ws = XLSX.utils.json_to_sheet(masterDB);
+        const ws = XLSX.utils.json_to_sheet(db);
         const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "J&K Census Data");
-        XLSX.writeFile(wb, "JK_Enrollment_Master_List.xlsx");
+        XLSX.utils.book_append_sheet(wb, ws, "Kashmir Census");
+        XLSX.writeFile(wb, "Kashmir_Division_Education.xlsx");
     }
 </script>
 </body>
