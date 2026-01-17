@@ -3,149 +3,180 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Offline Enrollment Portal</title>
+    <title>100% Enrollment - Dropout Tracker</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        body { background-color: #f0f2f5; padding: 20px; font-family: sans-serif; }
-        .household-card { background: #fff; border-top: 5px solid #0d6efd; border-radius: 10px; padding: 20px; margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .member-card { background: #ffffff; border-left: 5px solid #198754; border-radius: 8px; padding: 15px; margin-bottom: 15px; border: 1px solid #ddd; }
-        .doc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; font-size: 0.85rem; background: #f8f9fa; padding: 10px; border-radius: 5px; }
-        .stats-box { background: #e9ecef; padding: 10px; border-radius: 8px; margin-bottom: 20px; font-weight: bold; text-align: center; }
+        body { background-color: #f4f7f6; padding: 15px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .household-card { background: #fff; border-top: 5px solid #0d6efd; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .member-card { background: #ffffff; border-left: 5px solid #ffc107; border-radius: 10px; padding: 15px; margin-bottom: 15px; border: 1px solid #eee; position: relative; }
+        .dropout-section { background: #fff3f3; border: 1px dashed #dc3545; padding: 10px; border-radius: 8px; margin-top: 10px; display: none; }
+        .stats-banner { background: #212529; color: white; padding: 10px; border-radius: 8px; margin-bottom: 20px; display: flex; justify-content: space-around; font-size: 0.9rem; }
     </style>
 </head>
 <body>
 
-<div class="container" style="max-width: 800px;">
-    <div class="text-center mb-4">
-        <h1>🎓 Mission: 100% Enrollment</h1>
-        <div id="offlineBadge" class="badge bg-success">Offline Storage Active</div>
+<div class="container" style="max-width: 900px;">
+    <div class="text-center mb-3">
+        <h2 class="fw-bold">🎓 Education Census Portal</h2>
+        <span class="badge bg-primary">Automated ID System Active</span>
     </div>
 
-    <div id="stats" class="stats-box">Total Records Saved: 0</div>
+    <div class="stats-banner">
+        <div>🏠 Houses: <span id="houseCount">0</span></div>
+        <div>👥 Individuals: <span id="personCount">0</span></div>
+    </div>
     
     <div class="household-card">
-        <h5>🏠 Household Details</h5>
-        <input type="text" id="houseId" class="form-control mb-2" placeholder="House No. / Landmark">
-        <input type="text" id="headName" class="form-control mb-2" placeholder="Head of Household Name">
-        <input type="text" id="contact" class="form-control" placeholder="Contact Number">
+        <h5 class="text-primary mb-3">📍 Location & Household</h5>
+        <div class="row g-2">
+            <div class="col-6">
+                <label class="small fw-bold">Household Number</label>
+                <input type="text" id="houseId" class="form-control bg-light" readonly>
+            </div>
+            <div class="col-6">
+                <label class="small fw-bold">Mohallah / Habitation</label>
+                <input type="text" id="habitation" class="form-control" placeholder="Enter Area Name">
+            </div>
+            <div class="col-12 mt-2">
+                <input type="text" id="headName" class="form-control" placeholder="Head of Household Name">
+            </div>
+        </div>
     </div>
 
     <div id="membersContainer"></div>
 
     <div class="d-grid gap-2 mb-5">
-        <button class="btn btn-outline-primary btn-lg" onclick="addMember()">+ Add Person</button>
-        <button class="btn btn-primary btn-lg" onclick="saveHousehold()">Save & Clear Form</button>
+        <button class="btn btn-warning btn-lg fw-bold" onclick="addMember()">+ Add Family Member</button>
+        <button class="btn btn-primary btn-lg" onclick="saveHousehold()">✅ Save Household & Next</button>
         <hr>
-        <button class="btn btn-success" onclick="exportToExcel()">📊 Download Master Excel</button>
-        <button class="btn btn-danger btn-sm mt-3" onclick="clearDatabase()">Clear All Stored Data</button>
+        <button class="btn btn-success" onclick="exportToExcel()">📊 Download Final Excel Sheet</button>
+        <button class="btn btn-outline-danger btn-sm mt-3" onclick="clearDatabase()">Reset Database</button>
     </div>
 </div>
 
 <script>
-    // Load data from LocalStorage on startup
-    let masterDatabase = JSON.parse(localStorage.getItem('surveyData')) || [];
-    updateStats();
+    let masterDatabase = JSON.parse(localStorage.getItem('eduSurveyData')) || [];
+    
+    // Auto-Generate House ID logic
+    function generateHouseID() {
+        const lastHouse = masterDatabase.length > 0 ? masterDatabase[masterDatabase.length - 1].HouseID : "H-1000";
+        const lastNum = parseInt(lastHouse.split('-')[1]);
+        document.getElementById('houseId').value = `H-${lastNum + 1}`;
+    }
 
-    function updateStats() {
-        document.getElementById('stats').innerText = `Total Records Stored: ${masterDatabase.length}`;
+    function updateCounters() {
+        document.getElementById('houseCount').innerText = [...new Set(masterDatabase.map(d => d.HouseID))].length;
+        document.getElementById('personCount').innerText = masterDatabase.length;
     }
 
     function addMember() {
         const container = document.getElementById('membersContainer');
+        const memberId = Date.now();
         const div = document.createElement('div');
         div.className = 'member-card';
         div.innerHTML = `
-            <div class="d-flex justify-content-between"><h6>Person Entry</h6><button class="btn-close btn-sm" onclick="this.parentElement.parentElement.remove()"></button></div>
-            <div class="row g-2 mt-1">
-                <div class="col-7"><input type="text" class="form-control memName" placeholder="Full Name"></div>
-                <div class="col-5"><input type="number" class="form-control memAge" placeholder="Age" onchange="autoSuggest(this)"></div>
+            <div class="row g-2">
+                <div class="col-7"><input type="text" class="form-control memName" placeholder="Name"></div>
+                <div class="col-5"><input type="number" class="form-control memAge" placeholder="Age" onchange="handleAgeLogic(this)"></div>
             </div>
-            <div class="mt-3">
-                <label class="form-label small fw-bold">Target Facility</label>
-                <select class="form-select memFacility">
-                    <option value="None">Select Facility...</option>
-                    <option value="Anganwadi / PlaySchool">Anganwadi / Pre-School</option>
-                    <option value="Government Primary School">Government Primary School</option>
-                    <option value="High School / Vocational">High School / Vocational</option>
-                    <option value="Adult Education Center">Adult Education Center</option>
+
+            <div class="mt-2 row g-2">
+                <div class="col-6">
+                    <select class="form-select memStatus" onchange="toggleDropout(this)">
+                        <option value="Enrolled">Currently Enrolled</option>
+                        <option value="Dropout">Dropout</option>
+                        <option value="Never Enrolled">Never Enrolled</option>
+                    </select>
+                </div>
+                <div class="col-6">
+                    <select class="form-select memAgeDoc">
+                        <option value="">Age Proof?</option>
+                        <option value="Birth Certificate">Birth Cert</option>
+                        <option value="Hospital Record">Hospital Rec</option>
+                        <option value="Aadhar/ID">Aadhar/ID</option>
+                        <option value="Declaration">Self-Declaration</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="dropout-section">
+                <label class="small fw-bold text-danger">Dropout Details</label>
+                <input type="text" class="form-control form-control-sm mb-2 prevEdu" placeholder="Last Class Completed">
+                <textarea class="form-control form-control-sm mb-2 discReason" placeholder="Reason for discontinuation?"></textarea>
+                <select class="form-select form-select-sm willingJoin">
+                    <option value="">Willing to join again?</option>
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                    <option value="Requires Counseling">Requires Counseling</option>
                 </select>
-            </div>
-            <div class="mt-3 doc-grid">
-                <div><input type="checkbox" class="doc-bc"> Birth Cert</div>
-                <div><input type="checkbox" class="doc-id"> ID/Aadhar</div>
-                <div><input type="checkbox" class="doc-tc"> Transfer Cert</div>
-                <div><input type="checkbox" class="doc-photo"> Photo</div>
             </div>
         `;
         container.appendChild(div);
     }
 
-    function autoSuggest(input) {
+    function handleAgeLogic(input) {
         const age = input.value;
-        const facilitySelect = input.parentElement.parentElement.parentElement.querySelector('.memFacility');
-        if (age > 0 && age <= 5) facilitySelect.value = "Anganwadi / PlaySchool";
-        else if (age > 5 && age <= 18) facilitySelect.value = "Government Primary School";
-        else if (age > 18) facilitySelect.value = "Adult Education Center";
+        const card = input.closest('.member-card');
+        if (age < 3 || age > 18) {
+            card.style.borderLeft = "5px solid #6c757d"; // Adult/Toddler color
+        } else {
+            card.style.borderLeft = "5px solid #ffc107"; // School age color
+        }
+    }
+
+    function toggleDropout(select) {
+        const dropoutDiv = select.closest('.member-card').querySelector('.dropout-section');
+        dropoutDiv.style.display = (select.value === 'Dropout' || select.value === 'Never Enrolled') ? 'block' : 'none';
     }
 
     function getAgeGroup(age) {
         if (age <= 3) return "0-3"; if (age <= 6) return "3-6"; if (age <= 14) return "6-14";
-        if (age <= 18) return "14-18"; if (age <= 35) return "18-35"; if (age <= 60) return "35-60";
-        return "60+";
+        if (age <= 18) return "14-18"; return "18+";
     }
 
     function saveHousehold() {
         const hId = document.getElementById('houseId').value;
+        const area = document.getElementById('habitation').value;
         const hHead = document.getElementById('headName').value;
-        const contact = document.getElementById('contact').value;
-        const memberCards = document.querySelectorAll('.member-card');
+        const cards = document.querySelectorAll('.member-card');
 
-        if(!hId || memberCards.length === 0) { alert("Fill House ID and add at least one person!"); return; }
+        if(!area || cards.length === 0) { alert("Area and Family Member details required!"); return; }
 
-        memberCards.forEach(card => {
-            const docs = [];
-            if(card.querySelector('.doc-bc').checked) docs.push("BC");
-            if(card.querySelector('.doc-id').checked) docs.push("ID");
-            if(card.querySelector('.doc-tc').checked) docs.push("TC");
-            if(card.querySelector('.doc-photo').checked) docs.push("Photo");
-
+        cards.forEach(card => {
             masterDatabase.push({
-                "HouseID": hId, "HeadOfHouse": hHead, "Phone": contact,
+                "HouseID": hId,
+                "Mohallah_Habitation": area,
+                "HeadOfHouse": hHead,
                 "Name": card.querySelector('.memName').value,
-                "Age": card.querySelector('.memAge').value,
+                "PresentAge": card.querySelector('.memAge').value,
                 "AgeGroup": getAgeGroup(card.querySelector('.memAge').value),
-                "Facility": card.querySelector('.memFacility').value,
-                "Docs": docs.join(", "),
-                "Status": docs.length >= 3 ? "READY" : "MISSING_DOCS"
+                "AgeSupportDoc": card.querySelector('.memAgeDoc').value,
+                "EnrollmentStatus": card.querySelector('.memStatus').value,
+                "LastClassCompleted": card.querySelector('.prevEdu').value || "N/A",
+                "ReasonForDiscontinue": card.querySelector('.discReason').value || "N/A",
+                "WillingToRejoin": card.querySelector('.willingJoin').value || "N/A"
             });
         });
 
-        // SAVE TO LOCALSTORAGE
-        localStorage.setItem('surveyData', JSON.stringify(masterDatabase));
-        
-        alert("Saved to phone storage!");
-        document.getElementById('membersContainer').innerHTML = '';
-        document.getElementById('houseId').value = '';
-        updateStats();
+        localStorage.setItem('eduSurveyData', JSON.stringify(masterDatabase));
+        alert("Household Recorded!");
+        location.reload(); // Resets form and increments House ID
     }
 
     function exportToExcel() {
-        if(masterDatabase.length === 0) { alert("No data stored!"); return; }
         const ws = XLSX.utils.json_to_sheet(masterDatabase);
         const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "EnrollmentData");
-        XLSX.writeFile(wb, "Community_Survey_Data.xlsx");
+        XLSX.utils.book_append_sheet(wb, ws, "CensusData");
+        XLSX.writeFile(wb, "Community_Education_Census.xlsx");
     }
 
     function clearDatabase() {
-        if(confirm("Are you sure? This will delete ALL records from this phone.")) {
-            localStorage.removeItem('surveyData');
-            masterDatabase = [];
-            updateStats();
-        }
+        if(confirm("Erase all stored data?")) { localStorage.removeItem('eduSurveyData'); location.reload(); }
     }
+
+    window.onload = () => { generateHouseID(); updateCounters(); };
 </script>
 </body>
 </html>
-
+        
