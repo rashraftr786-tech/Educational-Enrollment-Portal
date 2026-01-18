@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Math Quest: Progress Saved!</title>
+    <title>Math Quest: Right-to-Left Action!</title>
     <style>
         body { font-family: 'Comic Sans MS', cursive, sans-serif; background-color: #eef9ff; text-align: center; padding: 20px; }
         
@@ -14,25 +14,26 @@
         .level-badge { background: #2196F3; color: white; padding: 8px 20px; border-radius: 15px; font-size: 1.2rem; margin-bottom: 15px; display: inline-block; font-weight: bold; }
 
         /* Borrowing Boxes */
-        .regroup-row { display: flex; justify-content: center; gap: 20px; margin-bottom: 10px; padding-left: 40px; }
+        .regroup-row { display: flex; justify-content: center; gap: 20px; margin-bottom: 10px; padding-left: 45px; }
         .regroup-box { width: 45px; height: 45px; border: 3px dashed #ff9800; border-radius: 8px; text-align: center; color: #ff9800; font-size: 1.5rem; background: #fffcf0; font-weight: bold; outline: none; }
 
-        .math-display { font-size: 4.5rem; font-weight: bold; text-align: right; font-family: 'Courier New', monospace; line-height: 1.1; margin: 20px 0; padding-right: 40px; letter-spacing: 15px; color: #333; }
+        .math-display { font-size: 4.5rem; font-weight: bold; text-align: right; font-family: 'Courier New', monospace; line-height: 1.1; margin: 20px 0; padding-right: 45px; letter-spacing: 15px; color: #333; }
 
         .divider { border-bottom: 8px solid #333; margin: 10px 0; border-radius: 10px; }
 
-        input[type="number"] { width: 100%; font-size: 4rem; text-align: center; border: 6px solid #4CAF50; border-radius: 20px; padding: 10px; margin: 20px 0; outline: none; box-sizing: border-box; }
+        /* Answer Boxes Row */
+        .answer-row { display: flex; justify-content: center; gap: 15px; margin: 20px 0; padding-left: 10px; }
+        .digit-box { width: 60px; height: 80px; font-size: 3.5rem; text-align: center; border: 4px solid #4CAF50; border-radius: 12px; font-family: 'Courier New', monospace; font-weight: bold; outline: none; background: #f9fff9; }
+        .digit-box:focus { border-color: #ff9800; background: #fff; }
 
-        .btn { border: none; padding: 18px 40px; font-size: 1.8rem; border-radius: 25px; cursor: pointer; font-weight: bold; transition: all 0.2s; color: white; width: 100%; }
-        #check-btn { background: #FF8C00; box-shadow: 0 6px 0 #2e7d32; }
-        #next-btn { background: ##4CAF50; box-shadow: 0 6px 0 #2e7d32; display: none; margin-top: 20px; }
+        .btn { border: none; padding: 18px 40px; font-size: 1.8rem; border-radius: 25px; cursor: pointer; font-weight: bold; transition: all 0.2s; color: white; width: 100%; margin-top: 10px; }
+        #check-btn { background: #ff5722; box-shadow: 0 6px 0 #bf360c; }
+        #next-btn { background: #4CAF50; box-shadow: 0 6px 0 #2e7d32; display: none; }
         .btn:active { transform: translateY(4px); box-shadow: none; }
 
         .prompt { min-height: 70px; font-size: 1.8rem; font-weight: bold; margin-top: 20px; display: flex; align-items: center; justify-content: center; border-radius: 20px; }
-        .success-prompt { color: #2e7d32; background: #e8f5e9; border: 3px solid #2e7d32; animation: pop 0.3s; }
+        .success-prompt { color: #2e7d32; background: #e8f5e9; border: 3px solid #2e7d32; }
         .fail-prompt { color: #d32f2f; background: #ffebee; border: 3px solid #d32f2f; }
-
-        @keyframes pop { 0% {transform: scale(0.8);} 100% {transform: scale(1);} }
 
         .footer-info { margin-top: 30px; color: #666; }
         .reset-btn { background: none; border: 2px solid #ccc; color: #999; padding: 5px 10px; border-radius: 5px; cursor: pointer; margin-top: 20px; }
@@ -41,7 +42,7 @@
 <body>
 
     <div class="score-box">⭐ Stars: <span id="stars">0</span></div>
-<h1><strong>Learning Stars Math Adventure</strong></h1>
+
     <div id="game-container">
         <div id="level-indicator" class="level-badge">Level 1: No Borrowing</div>
         
@@ -52,12 +53,17 @@
             <input type="text" class="regroup-box" maxlength="2">
         </div>
 
-        <div class="math-display" id="problem-text">0000<br>- 0000</div>
+        <div class="math-display" id="problem-text">9876<br>- 1234</div>
         <div class="divider"></div>
         
-        <input type="number" id="user-input" placeholder="????">
+        <div class="answer-row">
+            <input type="text" id="d3" class="digit-box" maxlength="1" placeholder="?">
+            <input type="text" id="d2" class="digit-box" maxlength="1" placeholder="?">
+            <input type="text" id="d1" class="digit-box" maxlength="1" placeholder="?">
+            <input type="text" id="d0" class="digit-box" maxlength="1" placeholder="?">
+        </div>
         
-        <button id="check-btn" class="btn" onclick="submitAnswer()">Submit Answer!</button>
+        <button id="check-btn" class="btn" onclick="checkAnswer()">Check Answer!</button>
         <div id="prompt-display" class="prompt"></div>
         <button id="next-btn" class="btn" onclick="nextQuestion()">Next Question ➔</button>
 
@@ -68,97 +74,83 @@
 
     <script>
         const problems = [
-            // 20 Without Regrouping
+            // (Previous 40 problems data kept exactly the same...)
             {a: 9876, b: 1234, reg: false}, {a: 8594, b: 2130, reg: false}, {a: 7765, b: 4321, reg: false}, {a: 6982, b: 5471, reg: false}, {a: 5544, b: 2233, reg: false},
             {a: 9999, b: 1111, reg: false}, {a: 8765, b: 3042, reg: false}, {a: 6432, b: 5121, reg: false}, {a: 7890, b: 5670, reg: false}, {a: 4567, b: 1234, reg: false},
             {a: 9283, b: 4172, reg: false}, {a: 8888, b: 4444, reg: false}, {a: 7654, b: 2321, reg: false}, {a: 6543, b: 1210, reg: false}, {a: 5978, b: 2634, reg: false},
             {a: 9345, b: 1234, reg: false}, {a: 8721, b: 5610, reg: false}, {a: 7439, b: 2128, reg: false}, {a: 6854, b: 3721, reg: false}, {a: 5999, b: 4888, reg: false},
-            // 20 With Regrouping
             {a: 5231, b: 2845, reg: true}, {a: 9000, b: 4567, reg: true}, {a: 7123, b: 3456, reg: true}, {a: 6412, b: 1823, reg: true}, {a: 8245, b: 3756, reg: true},
             {a: 4321, b: 1982, reg: true}, {a: 5555, b: 2777, reg: true}, {a: 8010, b: 3456, reg: true}, {a: 7421, b: 5634, reg: true}, {a: 6111, b: 2888, reg: true},
             {a: 9342, b: 4567, reg: true}, {a: 5005, b: 1236, reg: true}, {a: 7234, b: 4567, reg: true}, {a: 8111, b: 3222, reg: true}, {a: 4210, b: 1567, reg: true},
             {a: 6325, b: 2748, reg: true}, {a: 9102, b: 4356, reg: true}, {a: 7000, b: 2999, reg: true}, {a: 8432, b: 4567, reg: true}, {a: 5221, b: 1888, reg: true}
         ];
 
-        // LOAD SAVED DATA
         let currentIndex = parseInt(localStorage.getItem('mathIndex')) || 0;
         let totalStars = parseInt(localStorage.getItem('mathStars')) || 0;
 
-        const successPhrases = ["BOOM! You're a Genius!", "WOW! Super Math Skills!", "AMAZING! Keep it up!", "YOU ROCK! 5 Stars!", "SUPER SONIC! Correct!"];
-        const failPhrases = ["Oops! Let's try again!", "Not quite, Hero! Try again!", "Almost! Give it another look!", "You can do it! Try once more!"];
+        // RIGHT-TO-LEFT AUTO FOCUS LOGIC
+        const boxes = [document.getElementById('d0'), document.getElementById('d1'), document.getElementById('d2'), document.getElementById('d3')];
+        
+        boxes.forEach((box, index) => {
+            box.addEventListener('input', (e) => {
+                if (e.target.value.length === 1 && index < 3) {
+                    boxes[index + 1].focus(); // Move LEFT to the next higher place value
+                }
+            });
+            box.addEventListener('keydown', (e) => {
+                if (e.key === "Backspace" && e.target.value === "" && index > 0) {
+                    boxes[index - 1].focus(); // Move RIGHT back to the lower place value
+                }
+            });
+        });
 
         function loadQuestion() {
-            if (currentIndex >= problems.length) {
-                showFinishScreen();
-                return;
-            }
-
+            if (currentIndex >= problems.length) { showFinishScreen(); return; }
             const q = problems[currentIndex];
             document.getElementById('problem-text').innerHTML = `${q.a}<br>- ${q.b}`;
-            document.getElementById('user-input').value = '';
+            boxes.forEach(b => b.value = '');
             document.getElementById('prompt-display').innerHTML = '';
             document.getElementById('prompt-display').className = 'prompt';
             document.getElementById('next-btn').style.display = 'none';
-            document.getElementById('check-btn').style.display = 'inline-block';
+            document.getElementById('check-btn').style.display = 'block';
             document.getElementById('current-q').innerText = currentIndex + 1;
             document.getElementById('stars').innerText = totalStars;
-            
-            // Show/Hide Borrowing Boxes
             document.getElementById('borrow-area').style.visibility = q.reg ? 'visible' : 'hidden';
-            document.getElementById('level-indicator').innerText = q.reg ? 'Level 2: Borrowing Power ⚡' : 'Level 1: No Borrowing 🎈';
-            document.getElementById('level-indicator').style.background = q.reg ? '#9c27b0' : '#2196F3';
-            
-            // Clear borrow boxes
             document.querySelectorAll('.regroup-box').forEach(b => b.value = '');
+            boxes[0].focus(); // Always start at the ONES place
         }
 
         function checkAnswer() {
             const q = problems[currentIndex];
-            const userVal = parseInt(document.getElementById('user-input').value);
+            // Reconstruct number from boxes
+            const userVal = parseInt(boxes[3].value + boxes[2].value + boxes[1].value + boxes[0].value);
             const prompt = document.getElementById('prompt-display');
             
             if (userVal === (q.a - q.b)) {
                 totalStars += 5;
-                localStorage.setItem('mathStars', totalStars); // SAVE STARS
+                localStorage.setItem('mathStars', totalStars);
                 document.getElementById('stars').innerText = totalStars;
-                
-                prompt.innerText = successPhrases[Math.floor(Math.random() * successPhrases.length)];
+                prompt.innerText = "🌟 WOW! Correct! WORKED FROM RIGHT TO LEFT!";
                 prompt.className = 'prompt success-prompt';
                 document.getElementById('next-btn').style.display = 'block';
                 document.getElementById('check-btn').style.display = 'none';
             } else {
-                prompt.innerText = failPhrases[Math.floor(Math.random() * failPhrases.length)];
+                prompt.innerText = "❌ Not quite! Check your columns!";
                 prompt.className = 'prompt fail-prompt';
             }
         }
 
         function nextQuestion() {
             currentIndex++;
-            localStorage.setItem('mathIndex', currentIndex); // SAVE PROGRESS
+            localStorage.setItem('mathIndex', currentIndex);
             loadQuestion();
         }
 
-        function showFinishScreen() {
-            document.getElementById('game-container').innerHTML = `
-                <h1 style="color:#FFD700; font-size:3rem">🏆 MISSION COMPLETE!</h1>
-                <p style="font-size:2rem">You are a Math Hero!</p>
-                <div class="score-box">⭐ ${totalStars} Total Stars</div>
-                <br><br>
-                <button class="btn" style="background:#2196F3" onclick="resetGame()">Start New Game</button>
-            `;
-        }
+        function resetGame() { if (confirm("Start over?")) { localStorage.clear(); location.reload(); } }
+        function showFinishScreen() { document.getElementById('game-container').innerHTML = `<h1>🏆 CHAMPION!</h1><p>Stars: ${totalStars}</p><button class="btn" style="background:#2196F3" onclick="resetGame()">Play Again</button>`; }
 
-        function resetGame() {
-            if (confirm("Are you sure you want to delete all stars and start over?")) {
-                localStorage.clear();
-                location.reload();
-            }
-        }
-
-        // Initialize on load
         loadQuestion();
     </script>
 </body>
-</html>
-            
+</html>            
             
